@@ -1,0 +1,4 @@
+export enum ShaderType {
+  FRAGMENT_SHADER = "FRAGMENT_SHADER",
+  VERTEX_SHADER = "VERTEX_SHADER",
+}

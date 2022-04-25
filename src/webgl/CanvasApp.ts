@@ -1,7 +1,8 @@
 import {mat4, vec3} from "gl-matrix";
+import {ShaderType} from "./shaderType";
 
 export class CanvasApp {
-    VSHADER_SOURCE =
+    readonly VSHADER_SOURCE =
         'attribute vec3 a_Position;\n' +
         'attribute vec3 a_Color;\n' +
         'uniform mat4 u_Pmatrix;\n' +
@@ -13,7 +14,7 @@ export class CanvasApp {
         ' gl_Position = u_Pmatrix*u_Vmatrix*u_Mmatrix*vec4(a_Position,1.0);\n' +
         ' }\n';
 
-    FSHADER_SOURCE =
+    readonly FSHADER_SOURCE =
         ' precision mediump float;\n' +
         ' uniform vec4 u_FragColor;\n' +
         ' varying vec3 v_Color;\n' +
@@ -21,7 +22,7 @@ export class CanvasApp {
         ' gl_FragColor = vec4(v_Color,1.0);\n' +
         ' }\n';
 
-    triangle_vertex =
+    readonly triangle_vertex =
         [
             -1, -1, -1, 1, 1, 0,
             1, -1, -1, 1, 1, 0,
@@ -54,7 +55,8 @@ export class CanvasApp {
             1, 1, -1, 0, 1, 0
         ];
 
-     triangle_face = [0, 1, 2,
+    readonly triangle_face = [
+        0, 1, 2,
         0, 2, 3,
 
         4, 5, 6,
@@ -70,7 +72,8 @@ export class CanvasApp {
         16, 18, 19,
 
         20, 21, 22,
-        20, 22, 23];
+        20, 22, 23
+    ];
 
     view: HTMLCanvasElement;
 
@@ -80,7 +83,7 @@ export class CanvasApp {
         this.view.height = 500;
     }
 
-    getShader (gl: WebGLRenderingContext, type: 'VERTEX_SHADER' | 'FRAGMENT_SHADER', source: string) {
+    getShader (gl: WebGLRenderingContext, type: ShaderType, source: string) {
         const shader = gl.createShader(gl[type]);
 
         if (!shader) {
@@ -99,25 +102,17 @@ export class CanvasApp {
     }
 
     start() {
-        //const canvas = document.getElementById('canvasGL');
-
-        //if (!(canvas instanceof HTMLCanvasElement)) {
-            //throw new Error('No html canvas element.');       //}
-
-        // WebGL rendering context
         const gl = this.view.getContext("webgl", { antialias: false });
 
         if (!gl) {
             throw new Error('Unable to initialize WebGL.');
         }
 
-        let VS = this.getShader(gl, 'VERTEX_SHADER', this.VSHADER_SOURCE);
-        let FS = this.getShader(gl, 'FRAGMENT_SHADER', this.FSHADER_SOURCE);
+        let VS = this.getShader(gl, ShaderType.VERTEX_SHADER, this.VSHADER_SOURCE);
+        let FS = this.getShader(gl, ShaderType.FRAGMENT_SHADER, this.FSHADER_SOURCE);
 
         // WebGL program
         const shaderProgram = gl.createProgram();
-        console.log(shaderProgram);
-
         if (!shaderProgram) {
             throw new Error('Unable to create the program.');
         }
@@ -141,8 +136,6 @@ export class CanvasApp {
         gl.bindBuffer(gl.ARRAY_BUFFER, TRIANGLE_VERTEX);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.triangle_vertex), gl.STATIC_DRAW);
 
-
-
         let TRIANGLE_FACES = gl.createBuffer();
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, TRIANGLE_FACES);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(this.triangle_face), gl.STATIC_DRAW);
@@ -159,14 +152,24 @@ export class CanvasApp {
 
         gl.enable(gl.DEPTH_TEST);
 
-        let animate = function (time: number) {
+        let sendDataToShader = () => {
+            gl.uniformMatrix4fv(u_Pmatrix, false, PROJMATRIX);
+            gl.uniformMatrix4fv(u_Mmatrix, false, MODELMATRIX);
+            gl.uniformMatrix4fv(u_Vmatrix, false, VIEWMATRIX);
+
+            gl.vertexAttribPointer(a_Position, 3, gl.FLOAT, false, 4 * (3 + 3), 0);
+            gl.vertexAttribPointer(a_Color, 3, gl.FLOAT, false, 4 * (3 + 3), 3 * 4);
+
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+        }
+
+        let animate = (time: number) => {
 
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
             mat4.identity(MODELMATRIX);
             mat4.identity(VIEWMATRIX);
             mat4.identity(VIEWMATRIX_eye);
-
 
             //-------------------  VIEW --------------------------------------------
             mat4.rotateY(VIEWMATRIX_eye, VIEWMATRIX_eye, time * 0.0005);
@@ -181,7 +184,6 @@ export class CanvasApp {
             mat4.lookAt(VIEWMATRIX, eye, center, up);
 
             // --------------------------------------------------------------
-
             gl.clearColor(0.5, 0.5, 0.5, 1.0);
             gl.clear(gl.COLOR_BUFFER_BIT);
 
@@ -190,18 +192,7 @@ export class CanvasApp {
             mat4.translate(MODELMATRIX, MODELMATRIX, [0.0, 0.5, 0.0]); //x y z
             mat4.scale(MODELMATRIX, MODELMATRIX, [0.2, 1.2, 0.1]); //x y z
 
-
-            // gl.bindBuffer(gl.ARRAY_BUFFER, TRIANGLE_VERTEX);
-            gl.uniformMatrix4fv(u_Pmatrix, false, PROJMATRIX);
-            gl.uniformMatrix4fv(u_Mmatrix, false, MODELMATRIX);
-            gl.uniformMatrix4fv(u_Vmatrix, false, VIEWMATRIX);
-
-            gl.vertexAttribPointer(a_Position, 3, gl.FLOAT, false, 4 * (3 + 3), 0);
-            gl.vertexAttribPointer(a_Color, 3, gl.FLOAT, false, 4 * (3 + 3), 3 * 4);
-
-            //gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, TRIANGLE_FACES);
-            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
-
+            sendDataToShader();
 
             // --------------Cube------------------------------------------------
             let AngeleFace = 0;
@@ -218,16 +209,7 @@ export class CanvasApp {
                 mat4.scale(MODELMATRIX, MODELMATRIX, [0.1, 0.3, 0.1]); //x y z
               }
 
-              //gl.bindBuffer(gl.ARRAY_BUFFER, TRIANGLE_VERTEX);
-              gl.uniformMatrix4fv(u_Pmatrix, false, PROJMATRIX);
-              gl.uniformMatrix4fv(u_Mmatrix, false, MODELMATRIX);
-              gl.uniformMatrix4fv(u_Vmatrix, false, VIEWMATRIX);
-
-              gl.vertexAttribPointer(a_Position, 3, gl.FLOAT, false, 4 * (3 + 3), 0);
-              gl.vertexAttribPointer(a_Color, 3, gl.FLOAT, false, 4 * (3 + 3), 3 * 4);
-
-              //gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, TRIANGLE_FACES);
-              gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+              sendDataToShader();
             }
 
             gl.flush();
