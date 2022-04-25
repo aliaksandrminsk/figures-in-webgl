@@ -1,6 +1,6 @@
 .header {
   width: 50rem;
-  height: 15rem;
+  height: 16rem;
   display: grid;
   grid-template-rows: 1fr 1fr;
   grid-template-columns: 1fr 1fr;

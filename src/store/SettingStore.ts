@@ -1,4 +1,4 @@
-import { makeObservable, observable } from "mobx";
+import { makeAutoObservable } from "mobx";
 
 export enum ProjectionType {
   Perspective = "PERSPECTIVE",
@@ -6,24 +6,26 @@ export enum ProjectionType {
 }
 
 export class SettingStore {
-  left = -3.0;
-  right = 3.0;
-  bottom = -3.0;
-  top = 3.0;
-  near = 8.0;
-  far = 14.0;
+  left = 0;
+  right = 0;
+  bottom = 0;
+  top = 0;
+  near = 0;
+  far = 0;
   projectionType = ProjectionType.Perspective;
 
   constructor() {
-    makeObservable(this, {
-      left: observable,
-      right: observable,
-      bottom: observable,
-      top: observable,
-      near: observable,
-      far: observable,
-      projectionType: observable,
-    });
+    makeAutoObservable(this);
+    this.reset();
+  }
+
+  reset() {
+    this.left = -3.0;
+    this.right = 3.0;
+    this.bottom = -3.0;
+    this.top = 3.0;
+    this.near = 8.0;
+    this.far = 14.0;
   }
 }
 

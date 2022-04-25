@@ -1,5 +1,7 @@
 import { mat4, vec3 } from "gl-matrix";
 import { ShaderType } from "./ShaderType";
+import SettingStore, { ProjectionType } from "../store/SettingStore";
+import { autorun } from "mobx";
 
 export class CanvasApp {
   readonly VSHADER_SOURCE =
@@ -54,11 +56,13 @@ export class CanvasApp {
   ];
 
   view: HTMLCanvasElement;
+  store: SettingStore;
 
-  constructor() {
+  constructor(store: SettingStore) {
     this.view = document.createElement("canvas");
     this.view.width = 500;
     this.view.height = 500;
+    this.store = store;
   }
 
   getShader(gl: WebGLRenderingContext, type: ShaderType, source: string) {
@@ -136,9 +140,33 @@ export class CanvasApp {
 
     // ---------------------------------------------------------------------
     let PROJMATRIX: mat4 = mat4.create();
-    //mat4.perspective(PROJMATRIX, 26, this.view.width / this.view.height, 8, 20);
-    //mat4.ortho(PROJMATRIX, -4.0, 4.0, -4.0, 4.0, 4.0, 25.0);
-    mat4.frustum(PROJMATRIX, -3.0, 3.0, -3.0, 3.0, 8.0, 14.0);
+
+    autorun(() => {
+      //mat4.perspective(PROJMATRIX, 26, this.view.width / this.view.height, 8, 20);//Todo
+      if (this.store.projectionType === ProjectionType.Perspective) {
+        mat4.frustum(
+          PROJMATRIX,
+          this.store.left,
+          this.store.right,
+          this.store.bottom,
+          this.store.top,
+          this.store.near,
+          this.store.far
+        );
+      } else if (this.store.projectionType === ProjectionType.Orthographic) {
+        mat4.ortho(
+          PROJMATRIX,
+          this.store.left,
+          this.store.right,
+          this.store.bottom,
+          this.store.top,
+          this.store.near,
+          this.store.far
+        );
+      } else {
+        throw new Error("Unable to create the projection matrix.");
+      }
+    });
 
     let VIEWMATRIX = mat4.create();
     let MODELMATRIX = mat4.create();
