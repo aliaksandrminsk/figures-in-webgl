@@ -1,5 +1,5 @@
 import { mat4, vec3 } from "gl-matrix";
-import { ShaderType } from "./shaderType";
+import { ShaderType } from "./ShaderType";
 
 export class CanvasApp {
   readonly VSHADER_SOURCE =
