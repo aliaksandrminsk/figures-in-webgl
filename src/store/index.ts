@@ -5,10 +5,10 @@ const store = {
   settingStore: new SettingStore(),
 };
 
-export const StoreContext = createContext({} as typeof store);
+export const StoreContext = createContext({} as any);
 
 export const useStore = () => {
-  return useContext(StoreContext) as typeof store;
+  return useContext(StoreContext) as any;
 };
 
 export default store;

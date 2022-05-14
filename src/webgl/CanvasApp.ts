@@ -18,12 +18,12 @@ export class CanvasApp {
 
   readonly FSHADER_SOURCE =
     " precision mediump float;\n" +
-    " uniform vec4 u_FragColor;\n" +
     " varying vec3 v_Color;\n" +
     " void main() {\n" +
     " gl_FragColor = vec4(v_Color,1.0);\n" +
     " }\n";
 
+  //3 numbers - x,y,z + 3 number - colors, 1 row - one side of figure - 2 triangles - 4 vertex.
   readonly triangle_vertex = [
     -1, -1, -1, 1, 1, 0, 1, -1, -1, 1, 1, 0, 1, 1, -1, 1, 1, 0, -1, 1, -1, 1, 1,
     0,
@@ -41,6 +41,7 @@ export class CanvasApp {
     -1, 1, -1, 0, 1, 0, -1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, -1, 0, 1, 0,
   ];
 
+  //triangle vertex
   readonly triangle_face = [
     0, 1, 2, 0, 2, 3,
 
@@ -142,26 +143,35 @@ export class CanvasApp {
     let PROJMATRIX: mat4 = mat4.create();
 
     autorun(() => {
-      //mat4.perspective(PROJMATRIX, 26, this.view.width / this.view.height, 8, 20);//Todo
       if (this.store.projectionType === ProjectionType.Perspective) {
+        mat4.perspective(
+          PROJMATRIX,
+          this.store.fovy_p,
+          this.store.aspect_p,
+          this.store.near_p,
+          this.store.far_p
+        );
+      } else if (this.store.projectionType === ProjectionType.Frustum) {
+        //Object size depends on distance
         mat4.frustum(
           PROJMATRIX,
-          this.store.left,
-          this.store.right,
-          this.store.bottom,
-          this.store.top,
-          this.store.near,
-          this.store.far
+          this.store.left_f,
+          this.store.right_f,
+          this.store.bottom_f,
+          this.store.top_f,
+          this.store.near_f,
+          this.store.far_f
         );
       } else if (this.store.projectionType === ProjectionType.Orthographic) {
+        //Object size doesn't depend on distance
         mat4.ortho(
           PROJMATRIX,
-          this.store.left,
-          this.store.right,
-          this.store.bottom,
-          this.store.top,
-          this.store.near,
-          this.store.far
+          this.store.left_o,
+          this.store.right_o,
+          this.store.bottom_o,
+          this.store.top_o,
+          this.store.near_o,
+          this.store.far_o
         );
       } else {
         throw new Error("Unable to create the projection matrix.");
@@ -179,6 +189,7 @@ export class CanvasApp {
       gl.uniformMatrix4fv(u_Mmatrix, false, MODELMATRIX);
       gl.uniformMatrix4fv(u_Vmatrix, false, VIEWMATRIX);
 
+      //4 - bites, 3 - x,y,z, 3- rgb.
       gl.vertexAttribPointer(a_Position, 3, gl.FLOAT, false, 4 * (3 + 3), 0);
       gl.vertexAttribPointer(a_Color, 3, gl.FLOAT, false, 4 * (3 + 3), 3 * 4);
 
