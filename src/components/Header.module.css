@@ -1,8 +1,8 @@
 .header {
   width: 50rem;
-  height: 16rem;
+  height: 25rem;
   display: grid;
-  grid-template-rows: 1fr 1fr;
+  grid-template-rows: 8rem auto;
   grid-template-columns: 1fr 1fr;
 }
 
@@ -15,7 +15,7 @@
 }
 
 .projectionType {
-  grid-column: 1/2;
+  grid-column: 2/3;
   grid-row: 1/2;
   border: 1px solid grey;
   display: grid;
@@ -24,26 +24,40 @@
   padding: 0.4rem;
 }
 
-.projectionType > div {
+
+.projectionType > div:nth-child(1) {
   display: flex;
-  justify-content: center;
+  justify-content: right;
   align-items: center;
 }
 
-.leftItem {
+.projectionType > div:nth-child(2) {
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  padding-left: 1rem;
+}
+
+.cameraType {
   grid-column: 1/2;
-  grid-row: 2/3;
+  grid-row: 1/2;
   border: 1px solid grey;
-  background-color: aqua;
-  border: 1px solid grey;
-  position: relative;
+  display: grid;
+  grid-template-rows: 1fr;
+  grid-template-columns: 1fr 1fr;
+  padding: 0.4rem;
 }
 
-.leftItem > div {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+.cameraType > div:nth-child(1) {
+  display: flex;
+  justify-content: right;
+  align-items: center;
+  padding-right: 1rem;
 }
 
-
+.cameraType > div:nth-child(2) {
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  padding-left: 1rem;
+}

@@ -59,8 +59,8 @@ const PProjPanel = () => {
             type="range"
             id="near"
             name="near"
-            min="2"
-            max="10"
+            min="0"
+            max="20"
             step="0.5"
             value={store.near_p}
             onChange={(e) => changeHandler("near_p", e)}
@@ -73,7 +73,7 @@ const PProjPanel = () => {
             type="range"
             id="far"
             name="far"
-            min="10"
+            min="0"
             max="20"
             step="0.5"
             value={store.far_p}

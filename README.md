@@ -1,6 +1,6 @@
 # Figures-In-WebGL Example
 
-In process... The task is not completed.
+Showing figures with different settings in WebGL. 
 
 To run the package.
 

@@ -102,8 +102,8 @@ const ProjPanel = (props: ProjPanelProps) => {
             type="range"
             id="near"
             name="near"
-            min="2"
-            max="10"
+            min="0"
+            max="20"
             step="0.5"
             value={near}
             onChange={(e) => changeHandler(props.near, e)}
@@ -116,7 +116,7 @@ const ProjPanel = (props: ProjPanelProps) => {
             type="range"
             id="far"
             name="far"
-            min="10"
+            min="0"
             max="20"
             step="0.5"
             value={far}
@@ -124,7 +124,7 @@ const ProjPanel = (props: ProjPanelProps) => {
           />
           <output id="farOutput">{far}</output>
         </div>
-        <div>
+        <div className={classes.reset}>
           <div />
           <input type="button" value="Reset" onClick={resetHandler} />
           <div />

@@ -1,6 +1,9 @@
 import { mat4, vec3 } from "gl-matrix";
 import { ShaderType } from "./ShaderType";
-import SettingStore, { ProjectionType } from "../store/SettingStore";
+import SettingStore, {
+  CameraType,
+  ProjectionType,
+} from "../store/SettingStore";
 import { autorun } from "mobx";
 
 export class CanvasApp {
@@ -204,16 +207,29 @@ export class CanvasApp {
       mat4.identity(VIEWMATRIX_eye);
 
       //-------------------  VIEW --------------------------------------------
-      mat4.rotateY(VIEWMATRIX_eye, VIEWMATRIX_eye, time * 0.0005);
-      mat4.translate(VIEWMATRIX_eye, VIEWMATRIX_eye, [0.0, 0.0, 5.0]);
+      if (this.store.cameraType === CameraType.Free) {
+        mat4.translate(VIEWMATRIX, VIEWMATRIX, [
+          this.store.x_free,
+          this.store.y_free,
+          this.store.z_free,
+        ]);
+        mat4.rotateY(VIEWMATRIX, VIEWMATRIX, time * 0.0005);
+      } else {
+        mat4.rotateY(VIEWMATRIX_eye, VIEWMATRIX_eye, time * 0.0005);
+        mat4.translate(VIEWMATRIX_eye, VIEWMATRIX_eye, [0.0, 0.0, 5.0]);
 
-      let eye = vec3.fromValues(0.0, 5.0, 5.0);
+        let eye = vec3.fromValues(
+          this.store.x_target,
+          this.store.y_target,
+          this.store.z_target
+        );
 
-      vec3.transformMat4(eye, eye, VIEWMATRIX_eye);
+        vec3.transformMat4(eye, eye, VIEWMATRIX_eye);
 
-      let center = vec3.fromValues(0.0, 0.0, 0.0);
-      let up = vec3.fromValues(0.0, 1.0, 0.0);
-      mat4.lookAt(VIEWMATRIX, eye, center, up);
+        let center = vec3.fromValues(0.0, 0.0, 0.0);
+        let up = vec3.fromValues(0.0, 1.0, 0.0);
+        mat4.lookAt(VIEWMATRIX, eye, center, up);
+      }
 
       // --------------------------------------------------------------
       gl.clearColor(0.5, 0.5, 0.5, 1.0);
