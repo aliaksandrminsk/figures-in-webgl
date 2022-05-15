@@ -4,10 +4,14 @@ import { useStore } from "../../store";
 import { runInAction } from "mobx";
 import { observer } from "mobx-react-lite";
 
+type typeX = "x_target" | "x_free";
+type typeY = "y_target" | "y_free";
+type typeZ = "z_target" | "z_free";
+
 export type CameraPanelProps = {
-  x: string;
-  y: string;
-  z: string;
+  x: typeX;
+  y: typeY;
+  z: typeZ;
 };
 
 const CameraPanel = (props: CameraPanelProps) => {
@@ -17,7 +21,7 @@ const CameraPanel = (props: CameraPanelProps) => {
   const z = store[props.z];
 
   const changeHandler = (
-    target: string,
+    target: typeX | typeY | typeZ,
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     runInAction(() => {
