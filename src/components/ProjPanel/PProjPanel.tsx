@@ -1,6 +1,6 @@
 import classes from "./PProjPanel.module.css";
 import React from "react";
-import { useStore } from "../store";
+import { useStore } from "../../store";
 import { runInAction } from "mobx";
 import { observer } from "mobx-react-lite";
 
@@ -40,7 +40,7 @@ const PProjPanel = () => {
           <output id="fovyOutput">{store.fovy_p}</output>
         </div>
         <div>
-          <label htmlFor="aspect">Aspect</label>
+          <label htmlFor="aspect">Aspect:</label>
           <input
             type="range"
             id="aspect"
@@ -81,7 +81,7 @@ const PProjPanel = () => {
           />
           <output id="farOutput">{store.far_p}</output>
         </div>
-        <div>
+        <div className={classes.reset}>
           <div />
           <input type="button" value="Reset" onClick={resetHandler} />
           <div />

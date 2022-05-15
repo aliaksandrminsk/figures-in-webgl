@@ -6,7 +6,7 @@ import { ProjectionType } from "../store/SettingStore";
 import { runInAction } from "mobx";
 import FProjPanel from "./ProjPanel/FProjPanel";
 import OProjPanel from "./ProjPanel/OProjPanel";
-import PProjPanel from "./PProjPanel";
+import PProjPanel from "./ProjPanel/PProjPanel";
 
 const Header = () => {
   const { settingStore: store } = useStore();
